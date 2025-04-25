@@ -1,0 +1,65 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#poll-container {
+  width: 70%;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 30px;
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.label {
+  flex: 1;
+  font-size: 1.3rem;
+  text-align: left;
+}
+
+.bar {
+  flex: 5;
+  height: 20px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #00f2fe, #4facfe);
+  border-radius: 10px;
+  transition: width 0.5s ease-in-out;
+}
+
+.count {
+  width: 50px;
+  text-align: right;
+  font-weight: bold;
+}
