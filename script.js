@@ -1,4 +1,6 @@
 const votes = { A: 0, B: 0, C: 0, D: 0 };
+const streamId = "748c0ff7"; // substitui pelo teu stream ID se necessário
+const socket = new WebSocket(`wss://io.socialstream.ninja?streamId=${streamId}`);
 
 function updatePoll() {
   const total = votes.A + votes.B + votes.C + votes.D || 1;
@@ -14,10 +16,27 @@ function updatePoll() {
   document.getElementById("fillD").style.width = `${(votes.D / total) * 100}%`;
 }
 
-// Simulação de votos (podes substituir isto por WebSocket, comentários ou teclado)
-setInterval(() => {
-  const keys = ["A", "B", "C", "D"];
-  const random = keys[Math.floor(Math.random() * keys.length)];
-  votes[random]++;
-  updatePoll();
-}, 1500);
+// Remove acentos e põe tudo em maiúsculas
+function normalize(str) {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+}
+
+// WebSocket connection
+socket.addEventListener("open", () => {
+  console.log("Ligado ao WebSocket do SocialStreamNinja!");
+});
+
+socket.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+
+  if (data.type === "chat-message") {
+    const message = normalize(data.message);
+
+    if (message === "A") votes.A++;
+    else if (message === "B") votes.B++;
+    else if (message === "C") votes.C++;
+    else if (message === "D") votes.D++;
+
+    updatePoll();
+  }
+});
