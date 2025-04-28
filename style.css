@@ -2,65 +2,19 @@ body {
   margin: 0;
   padding: 0;
   background: transparent;
-  font-family: 'Montserrat', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  font-family: 'Montserrat', sans-serif;
 }
 
-#poll-container {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 30px;
-  border-radius: 12px;
-  width: 80%;
-  max-width: 800px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+#chartdiv {
+  width: 100%;
+  height: 100vh;
 }
 
-#question {
-  text-align: center;
-  color: white;
-  font-size: 2em;
-  margin-bottom: 30px;
-}
-
-#options {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.option {
-  background: #333;
-  padding: 15px;
-  border-radius: 10px;
-  position: relative;
-  color: white;
-}
-
-.label {
-  font-size: 1.2em;
-  margin-bottom: 10px;
-}
-
-.bar {
-  background: #555;
-  height: 15px;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.fill {
-  background: linear-gradient(90deg, #00f2fe, #4facfe);
-  width: 0%;
-  height: 100%;
-  transition: width 0.5s ease;
-}
-
-.count {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  font-weight: bold;
+/* Esconde o logo amCharts */
+#chartdiv > div > div:nth-child(1) > div > canvas:nth-child(2) {
+  display: none;
 }
