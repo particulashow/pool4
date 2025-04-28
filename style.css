@@ -10,56 +10,57 @@ body {
 }
 
 #poll-container {
-  width: 70%;
   background: rgba(0, 0, 0, 0.7);
   padding: 30px;
   border-radius: 12px;
-  color: white;
-  text-align: center;
-  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  width: 80%;
+  max-width: 800px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
-h1 {
-  font-size: 2.5rem;
+#question {
+  text-align: center;
+  color: white;
+  font-size: 2em;
   margin-bottom: 30px;
 }
 
-.options {
+#options {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
 .option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  background: #333;
+  padding: 15px;
+  border-radius: 10px;
+  position: relative;
+  color: white;
 }
 
 .label {
-  flex: 1;
-  font-size: 1.3rem;
-  text-align: left;
+  font-size: 1.2em;
+  margin-bottom: 10px;
 }
 
 .bar {
-  flex: 5;
-  height: 20px;
-  background: rgba(255,255,255,0.2);
+  background: #555;
+  height: 15px;
   border-radius: 10px;
   overflow: hidden;
 }
 
 .fill {
-  height: 100%;
+  background: linear-gradient(90deg, #00f2fe, #4facfe);
   width: 0%;
-  background: linear-gradient(to right, #00f2fe, #4facfe);
-  border-radius: 10px;
-  transition: width 0.5s ease-in-out;
+  height: 100%;
+  transition: width 0.5s ease;
 }
 
 .count {
-  width: 50px;
-  text-align: right;
+  position: absolute;
+  right: 20px;
+  top: 20px;
   font-weight: bold;
 }
