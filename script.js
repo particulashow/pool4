@@ -1,42 +1,44 @@
-const votes = { A: 0, B: 0, C: 0, D: 0 };
-const streamId = "748c0ff7"; // substitui pelo teu stream ID se necessário
-const socket = new WebSocket(`wss://io.socialstream.ninja?streamId=${streamId}`);
+const domain = new URLSearchParams(window.location.search).get('domain') || 'http://localhost:3900';
 
-function updatePoll() {
-  const total = votes.A + votes.B + votes.C + votes.D || 1;
+const options = {
+  A: "azul",
+  B: "vermelho",
+  C: "verde",
+  D: "amarelo"
+};
 
-  document.getElementById("countA").textContent = votes.A;
-  document.getElementById("countB").textContent = votes.B;
-  document.getElementById("countC").textContent = votes.C;
-  document.getElementById("countD").textContent = votes.D;
+function updatePoll(votes) {
+  const totalVotes = votes.A + votes.B + votes.C + votes.D;
 
-  document.getElementById("fillA").style.width = `${(votes.A / total) * 100}%`;
-  document.getElementById("fillB").style.width = `${(votes.B / total) * 100}%`;
-  document.getElementById("fillC").style.width = `${(votes.C / total) * 100}%`;
-  document.getElementById("fillD").style.width = `${(votes.D / total) * 100}%`;
+  document.getElementById('countA').textContent = votes.A;
+  document.getElementById('countB').textContent = votes.B;
+  document.getElementById('countC').textContent = votes.C;
+  document.getElementById('countD').textContent = votes.D;
+
+  document.getElementById('fillA').style.width = totalVotes ? (votes.A / totalVotes) * 100 + "%" : "0%";
+  document.getElementById('fillB').style.width = totalVotes ? (votes.B / totalVotes) * 100 + "%" : "0%";
+  document.getElementById('fillC').style.width = totalVotes ? (votes.C / totalVotes) * 100 + "%" : "0%";
+  document.getElementById('fillD').style.width = totalVotes ? (votes.D / totalVotes) * 100 + "%" : "0%";
 }
 
-// Remove acentos e põe tudo em maiúsculas
-function normalize(str) {
-  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+function fetchVotes() {
+  fetch(`${domain}/wordcloud`)
+    .then(response => response.json())
+    .then(data => {
+      const words = (data.wordcloud || "").toLowerCase().split(',');
+      const votes = {
+        A: words.filter(w => w.trim() === options.A).length,
+        B: words.filter(w => w.trim() === options.B).length,
+        C: words.filter(w => w.trim() === options.C).length,
+        D: words.filter(w => w.trim() === options.D).length
+      };
+      updatePoll(votes);
+    })
+    .catch(error => console.error("Erro ao buscar dados:", error));
 }
 
-// WebSocket connection
-socket.addEventListener("open", () => {
-  console.log("Ligado ao WebSocket do SocialStreamNinja!");
-});
+// Atualizar a cada segundo
+setInterval(fetchVotes, 1000);
 
-socket.addEventListener("message", (event) => {
-  const data = JSON.parse(event.data);
-
-  if (data.type === "chat-message") {
-    const message = normalize(data.message);
-
-    if (message === "A") votes.A++;
-    else if (message === "B") votes.B++;
-    else if (message === "C") votes.C++;
-    else if (message === "D") votes.D++;
-
-    updatePoll();
-  }
-});
+// Primeira carga
+fetchVotes();
