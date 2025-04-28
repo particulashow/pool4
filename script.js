@@ -1,36 +1,58 @@
-const domain = new URLSearchParams(window.location.search).get('domain') || 'http://localhost:3900';
+const params = new URLSearchParams(window.location.search);
+const domain = params.get('domain') || 'http://localhost:4000';
 
-const options = {
-  A: "azul",
-  B: "vermelho",
-  C: "verde",
-  D: "amarelo"
+// Pergunta e opções da URL
+const questionText = params.get('question') || 'Qual a tua cor preferida?';
+const optionA = params.get('optA') || 'Azul';
+const optionB = params.get('optB') || 'Vermelho';
+const optionC = params.get('optC') || 'Verde';
+const optionD = params.get('optD') || 'Amarelo';
+
+const wordsOptions = {
+  A: optionA.toLowerCase(),
+  B: optionB.toLowerCase(),
+  C: optionC.toLowerCase(),
+  D: optionD.toLowerCase()
 };
 
+document.getElementById('question').textContent = questionText;
+
+const optionsDiv = document.getElementById('options');
+
+// Cria as opções no HTML
+['A', 'B', 'C', 'D'].forEach(letter => {
+  const optDiv = document.createElement('div');
+  optDiv.classList.add('option');
+  optDiv.id = `option${letter}`;
+  optDiv.innerHTML = `
+    <div class="label">${letter}) ${params.get(`opt${letter}`)}</div>
+    <div class="bar"><div class="fill" id="fill${letter}"></div></div>
+    <div class="count" id="count${letter}">0</div>
+  `;
+  optionsDiv.appendChild(optDiv);
+});
+
+// Atualizar votos
 function updatePoll(votes) {
   const totalVotes = votes.A + votes.B + votes.C + votes.D;
 
-  document.getElementById('countA').textContent = votes.A;
-  document.getElementById('countB').textContent = votes.B;
-  document.getElementById('countC').textContent = votes.C;
-  document.getElementById('countD').textContent = votes.D;
-
-  document.getElementById('fillA').style.width = totalVotes ? (votes.A / totalVotes) * 100 + "%" : "0%";
-  document.getElementById('fillB').style.width = totalVotes ? (votes.B / totalVotes) * 100 + "%" : "0%";
-  document.getElementById('fillC').style.width = totalVotes ? (votes.C / totalVotes) * 100 + "%" : "0%";
-  document.getElementById('fillD').style.width = totalVotes ? (votes.D / totalVotes) * 100 + "%" : "0%";
+  ['A', 'B', 'C', 'D'].forEach(letter => {
+    document.getElementById(`count${letter}`).textContent = votes[letter];
+    document.getElementById(`fill${letter}`).style.width = totalVotes ? (votes[letter] / totalVotes) * 100 + "%" : "0%";
+  });
 }
 
+// Buscar dados
 function fetchVotes() {
   fetch(`${domain}/wordcloud`)
     .then(response => response.json())
     .then(data => {
       const words = (data.wordcloud || "").toLowerCase().split(',');
       const votes = {
-        A: words.filter(w => w.trim() === options.A).length,
-        B: words.filter(w => w.trim() === options.B).length,
-        C: words.filter(w => w.trim() === options.C).length,
-        D: words.filter(w => w.trim() === options.D).length
+        A: words.filter(w => w.trim() === wordsOptions.A).length,
+        B: words.filter(w => w.trim() === wordsOptions.B).length,
+        C: words.filter(w => w.trim() === wordsOptions.C).length,
+        D: words.filter(w => w.trim() === wordsOptions.D).length
       };
       updatePoll(votes);
     })
@@ -39,6 +61,4 @@ function fetchVotes() {
 
 // Atualizar a cada segundo
 setInterval(fetchVotes, 1000);
-
-// Primeira carga
 fetchVotes();
