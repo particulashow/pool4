@@ -1,64 +1,68 @@
+// Ler parâmetros do URL
 const params = new URLSearchParams(window.location.search);
+const question = params.get('question') || 'Qual a tua cor preferida?';
+const optA = params.get('optA') || 'Azul';
+const optB = params.get('optB') || 'Vermelho';
+const optC = params.get('optC') || 'Verde';
+const optD = params.get('optD') || 'Amarelo';
 const domain = params.get('domain') || 'http://localhost:4000';
 
-// Pergunta e opções da URL
-const questionText = params.get('question') || 'Qual a tua cor preferida?';
-const optionA = params.get('optA') || 'Azul';
-const optionB = params.get('optB') || 'Vermelho';
-const optionC = params.get('optC') || 'Verde';
-const optionD = params.get('optD') || 'Amarelo';
+let root = am5.Root.new("chartdiv");
 
-const wordsOptions = {
-  A: optionA.toLowerCase(),
-  B: optionB.toLowerCase(),
-  C: optionC.toLowerCase(),
-  D: optionD.toLowerCase()
-};
+root.setThemes([am5themes_Animated.new(root)]);
 
-document.getElementById('question').textContent = questionText;
+let pieChart = root.container.children.push(am5percent.PieChart.new(root, {
+  layout: root.verticalLayout
+}));
 
-const optionsDiv = document.getElementById('options');
+let series = pieChart.series.push(am5percent.PieSeries.new(root, {
+  valueField: "value",
+  categoryField: "category"
+}));
 
-// Cria as opções no HTML
-['A', 'B', 'C', 'D'].forEach(letter => {
-  const optDiv = document.createElement('div');
-  optDiv.classList.add('option');
-  optDiv.id = `option${letter}`;
-  optDiv.innerHTML = `
-    <div class="label">${letter}) ${params.get(`opt${letter}`)}</div>
-    <div class="bar"><div class="fill" id="fill${letter}"></div></div>
-    <div class="count" id="count${letter}">0</div>
-  `;
-  optionsDiv.appendChild(optDiv);
+series.labels.template.setAll({
+  textType: "circular",
+  fontSize: 25,
+  fill: am5.color("#FFF"),
+  fontWeight: "bold"
 });
 
-// Atualizar votos
-function updatePoll(votes) {
-  const totalVotes = votes.A + votes.B + votes.C + votes.D;
+series.slices.template.setAll({
+  strokeOpacity: 0
+});
 
-  ['A', 'B', 'C', 'D'].forEach(letter => {
-    document.getElementById(`count${letter}`).textContent = votes[letter];
-    document.getElementById(`fill${letter}`).style.width = totalVotes ? (votes[letter] / totalVotes) * 100 + "%" : "0%";
-  });
-}
+// Inicializa o gráfico
+series.data.setAll([
+  { category: optA, value: 0 },
+  { category: optB, value: 0 },
+  { category: optC, value: 0 },
+  { category: optD, value: 0 }
+]);
 
-// Buscar dados
+// Função para buscar os comentários e atualizar
 function fetchVotes() {
   fetch(`${domain}/wordcloud`)
     .then(response => response.json())
     .then(data => {
-      const words = (data.wordcloud || "").toLowerCase().split(',');
-      const votes = {
-        A: words.filter(w => w.trim() === wordsOptions.A).length,
-        B: words.filter(w => w.trim() === wordsOptions.B).length,
-        C: words.filter(w => w.trim() === wordsOptions.C).length,
-        D: words.filter(w => w.trim() === wordsOptions.D).length
-      };
-      updatePoll(votes);
+      const wordcloud = data.wordcloud?.toLowerCase().split(',') || [];
+
+      const countA = wordcloud.filter(word => word.trim() === optA.toLowerCase()).length;
+      const countB = wordcloud.filter(word => word.trim() === optB.toLowerCase()).length;
+      const countC = wordcloud.filter(word => word.trim() === optC.toLowerCase()).length;
+      const countD = wordcloud.filter(word => word.trim() === optD.toLowerCase()).length;
+
+      series.data.setAll([
+        { category: optA, value: countA > 0 ? countA : 0.01 },
+        { category: optB, value: countB > 0 ? countB : 0.01 },
+        { category: optC, value: countC > 0 ? countC : 0.01 },
+        { category: optD, value: countD > 0 ? countD : 0.01 }
+      ]);
     })
-    .catch(error => console.error("Erro ao buscar dados:", error));
+    .catch(error => console.error("Erro ao buscar votos:", error));
 }
 
-// Atualizar a cada segundo
+// Atualiza a cada segundo
 setInterval(fetchVotes, 1000);
-fetchVotes();
+
+// Limpa chat para nova votação
+fetch(`${domain}/clear-chat?words=${optA},${optB},${optC},${optD}`);
