@@ -4,7 +4,7 @@ const optA = params.get('optA') || 'Opção A';
 const optB = params.get('optB') || 'Opção B';
 const optC = params.get('optC') || 'Opção C';
 const optD = params.get('optD') || 'Opção D';
-const domain = params.get('domain') || 'http://localhost:4000';
+const domain = params.get('domain') || 'http://localhost:3900';
 
 let root = am5.Root.new("chartdiv");
 
